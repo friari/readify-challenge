@@ -22,8 +22,12 @@ function place(x, y, direction) {
 
   // all invalid arguments will exit the function with a result that won't return anything in the subsequent functions
   if (
-    (bearing !== 'NORTH' &&
+    (bearing !== 'NORTH WEST' &&
+      bearing !== 'NORTH' &&
+      bearing !== 'NORTH EAST' &&
+      bearing !== 'SOUTH EAST' &&
       bearing !== 'SOUTH' &&
+      bearing !== 'SOUTH WEST' &&
       bearing !== 'EAST' &&
       bearing !== 'WEST') ||
     (x < 0 || x > 5) ||
@@ -45,32 +49,90 @@ function place(x, y, direction) {
 // unless said move would result in the robot falling off the table
 function move() {
   switch (currentPosition[2]) {
+    case 'NORTH WEST':
+      if (
+        currentPosition[1] === 5 ||
+        (yAxis.includes(currentPosition[1] + 1) &&
+          xAxis.includes(currentPosition[0] - 1) &&
+          yAxis.indexOf(currentPosition[1] + 1) ===
+            xAxis.indexOf(currentPosition[0] - 1))
+      ) {
+        break;
+      }
+      currentPosition[1] += 1;
+      currentPosition[0] -= 1;
+      break;
     case 'NORTH':
       // if the robot is at the edge of the table OR IF THERE ARE ANY OBSTRUCTIONS, break out of switch statement without moving
       if (
         currentPosition[1] === 5 ||
         (yAxis.includes(currentPosition[1] + 1) &&
-          xAxis.includes(currentPosition[0]))
+          xAxis.includes(currentPosition[0]) &&
+          yAxis.indexOf(currentPosition[1] + 1) ===
+            xAxis.includes(currentPosition[0]))
       ) {
         break;
       }
       currentPosition[1] += 1;
       break;
+    case 'NORTH EAST':
+      if (
+        currentPosition[1] === 5 ||
+        (yAxis.includes(currentPosition[1] + 1) &&
+          xAxis.includes(currentPosition[0] + 1) &&
+          yAxis.indexOf(currentPosition[1] + 1) ===
+            xAxis.indexOf(currentPosition[0] + 1))
+      ) {
+        break;
+      }
+      currentPosition[1] += 1;
+      currentPosition[0] += 1;
+      break;
+    case 'SOUTH WEST':
+      if (
+        currentPosition[1] === 0 ||
+        (yAxis.includes(currentPosition[1] - 1) &&
+          xAxis.includes(currentPosition[0] - 1) &&
+          yAxis.indexOf(currentPosition[1] - 1) ===
+            xAxis.indexOf(currentPosition[0] - 1))
+      ) {
+        break;
+      }
+      currentPosition[1] -= 1;
+      currentPosition[0] -= 1;
+      break;
     case 'SOUTH':
       if (
         currentPosition[1] === 0 ||
         (yAxis.includes(currentPosition[1] - 1) &&
-          xAxis.includes(currentPosition[0]))
+          xAxis.includes(currentPosition[0]) &&
+          yAxis.indexOf(currentPosition[1] - 1) ===
+            xAxis.indexOf(currentPosition[0]))
       ) {
         break;
       }
       currentPosition[1] -= 1;
       break;
+    case 'SOUTH WEST':
+      if (
+        currentPosition[1] === 0 ||
+        (yAxis.includes(currentPosition[1] - 1) &&
+          xAxis.includes(currentPosition[0] + 1) &&
+          yAxis.indexOf(currentPosition[1] - 1) ===
+            xAxis.indexOf(currentPosition[0] + 1))
+      ) {
+        break;
+      }
+      currentPosition[1] -= 1;
+      currentPosition[0] += 1;
+      break;
     case 'EAST':
       if (
         currentPosition[0] === 5 ||
         (xAxis.includes(currentPosition[0] + 1) &&
-          yAxis.includes(currentPosition[1]))
+          yAxis.includes(currentPosition[1]) &&
+          xAxis.indexOf(currentPosition[0] + 1) ===
+            yAxis.indexOf(currentPosition[1]))
       ) {
         break;
       }
@@ -80,7 +142,9 @@ function move() {
       if (
         currentPosition[0] === 0 ||
         (xAxis.includes(currentPosition[0] - 1) &&
-          yAxis.includes(currentPosition[1]))
+          yAxis.includes(currentPosition[1]) &&
+          xAxis.indexOf(currentPosition[0] - 1) ===
+            yAxis.indexOf(currentPosition[1]))
       ) {
         break;
       }
@@ -107,34 +171,57 @@ function avoid(num1, num2) {
 // turns the robot one direction to the left by changing the bearing
 function left() {
   switch (currentPosition[2]) {
-    case 'NORTH':
+    case 'NORTH WEST':
       currentPosition[2] = 'WEST';
       break;
+    case 'NORTH':
+      currentPosition[2] = 'NORTH WEST';
+      break;
+    case 'NORTH EAST':
+      currentPosition[2] = 'NORTH';
+      break;
+    case 'SOUTH WEST':
+      currentPosition[2] = 'SOUTH';
+      break;
     case 'SOUTH':
+      currentPosition[2] = 'SOUTH EAST';
+      break;
+    case 'SOUTH EAST':
       currentPosition[2] = 'EAST';
       break;
     case 'EAST':
-      currentPosition[2] = 'NORTH';
+      currentPosition[2] = 'NORTH EAST';
       break;
     case 'WEST':
-      currentPosition[2] = 'SOUTH';
+      currentPosition[2] = 'SOUTH WEST';
   }
 }
 
 // turns the robot one direction to the right by changing the bearing
 function right() {
   switch (currentPosition[2]) {
+    case 'NORTH WEST':
+      currentPosition[2] = 'NORTH';
+      break;
     case 'NORTH':
+      currentPosition[2] = 'NORTH EAST';
+      break;
+    case 'NORTH EAST':
       currentPosition[2] = 'EAST';
       break;
-    case 'SOUTH':
+    case 'SOUTH WEST':
       currentPosition[2] = 'WEST';
       break;
-    case 'EAST':
+    case 'SOUTH':
+      currentPosition[2] = 'SOUTH WEST';
+      break;
+    case 'SOUTH EAST':
       currentPosition[2] = 'SOUTH';
+    case 'EAST':
+      currentPosition[2] = 'SOUTH EAST';
       break;
     case 'WEST':
-      currentPosition[2] = 'NORTH';
+      currentPosition[2] = 'NORTH WEST';
       break;
   }
 }
@@ -149,51 +236,71 @@ function report() {
   return currentPosition.toString();
 }
 
-// testing with supplied test data
+// testing with supplied test data (UNCOMMENT TO TEST)
+// place(0, 0, 'NORTH');
+// move();
+// report();
+
+// place(0, 0, 'NORTH');
+// left();
+// report();
+
+// place(1, 2, 'east');
+// move();
+// move();
+// left();
+// move();
+// report();
+
+// testing for cases where the arguments are invalid (UNCOMMENT TO TEST)
+// place(0, 0, 'NOR  TH');
+// move();
+// report();
+
+// place(1, 5, 'east');
+// move();
+// move();
+// left();
+// move();
+// report();
+
+// testing for iteration 2 (UNCOMMENT TO TEST)
+// place(1, 2, 'EAST');
+// avoid(2, 2);
+// avoid(2, 3);
+// move();
+// place(2, 3, 'EAST');
+// move();
+// left();
+// move();
+// report();
+
+// testing for iteration 3 (UNCOMMENT TO TEST)
+// place(1, 2, 'EAST');
+// avoid(2, 2);
+// avoid(2, 3);
+// move();
+// place(2, 3);
+// move();
+// left();
+// move();
+// report();
+
+// testing for iteration 4
 place(0, 0, 'NORTH');
+right();
 move();
 report();
 
-place(0, 0, 'NORTH');
-left();
-report();
-
-place(1, 2, 'east');
+place(2, 3, 'SOUTH WEST');
 move();
-move();
-left();
+right();
 move();
 report();
 
-// testing for cases where the arguments are invalid
-place(0, 0, 'NOR  TH');
-move();
-report();
-
-place(1, 5, 'east');
-move();
-move();
-left();
-move();
-report();
-
-// testing for iteration 2
 place(1, 2, 'EAST');
 avoid(2, 2);
-avoid(2, 3);
-move();
-place(2, 3, 'EAST');
-move();
-left();
-move();
-report();
-
-// testing for iteration 3
-place(1, 2, 'EAST');
-avoid(2, 2);
-avoid(2, 3);
-move();
-place(2, 3);
+avoid(1, 3);
 move();
 left();
 move();
