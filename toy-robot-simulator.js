@@ -1,12 +1,19 @@
 //defining default position and bearing (direction) that will be set in the place function
 let currentPosition = [];
 let bearing = undefined;
-// defining avoid array that will hold the coordinates of areas to avoid
-let avoidArea = [];
+
+// defining arrays that will hold the coordinates of areas to avoid - one for x and one for y axis
+let xAxis = [];
+let yAxis = [];
 
 function place(x, y, direction) {
   // redefining the defaults so the results don't accumulate
-  currentPosition = [];
+  if ((xAxis.toString() === false && yAxis.toString() === false) || !xAxis.includes(x) || !yAxis.includes(y)) {
+    currentPosition = [];
+  } else if (xAxis.includes(x) && yAxis.includes(y)) {
+    return;
+  }
+  
   bearing = direction.toUpperCase();
 
   // all invalid arguments will exit the function with a result that won't return anything in the subsequent functions
@@ -31,34 +38,26 @@ function place(x, y, direction) {
 function move() {
   switch (currentPosition[2]) {
     case "NORTH":
-      // if the robot is at the edge of the table, break out of switch statement without moving
-      if (currentPosition[1] === 5 || avoidArea.forEach(element => {
-        element[1] ++ === currentPosition[1];
-      })) {
+      // if the robot is at the edge of the table OR IF THERE ARE ANY OBSTRUCTIONS, break out of switch statement without moving
+      if (currentPosition[1] === 5 || yAxis.includes(currentPosition[1] + 1) && xAxis.includes(currentPosition[0])) {
         break;
       }
       currentPosition[1] += 1;
       break;
     case "SOUTH":
-      if (currentPosition[1] === 0 || avoidArea.forEach(element => {
-        element[1] -- === currentPosition[1];
-      })) {
+      if (currentPosition[1] === 0 || yAxis.includes(currentPosition[1] - 1) && xAxis.includes(currentPosition[0])) {
         break;
       }
       currentPosition[1] -= 1;
       break;
     case "EAST":
-      if (currentPosition[0] === 5 || avoidArea.forEach(element => {
-        element[0] ++ === currentPosition[0];
-      })) {
+      if (currentPosition[0] === 5 || xAxis.includes(currentPosition[0] + 1) && yAxis.includes(currentPosition[1])) {
         break;
       }
       currentPosition[0] += 1;
       break;
     case "WEST":
-      if (currentPosition[0] === 0 || avoidArea.forEach(element => {
-        element[0] -- === currentPosition[0];
-      })) {
+      if (currentPosition[0] === 0 || xAxis.includes(currentPosition[0] - 1) && yAxis.includes(currentPosition[1]) ) {
         break;
       }
       currentPosition[0] -= 1;
@@ -67,9 +66,8 @@ function move() {
 
 // creating the avoid function
 function avoid(num1, num2) {
-  let arr = [];
-  arr.push(num1, num2);
-  return avoidArea.push(arr);
+  xAxis.push(num1);
+  return yAxis.push(num2);
 }
 
 // turns the robot one direction to the left by changing the bearing
@@ -109,6 +107,10 @@ function right() {
 
 // outputs and returns the robot's position and direction after it has moved around the table
 function report() {
+  // resetting avoidArea
+  xAxis = [];
+  yAxis = [];
+  // logging the position
   console.log(currentPosition.toString());
   return currentPosition.toString();
 }
@@ -141,12 +143,10 @@ left();
 move();
 report();
 
-// testing for iteration 3
+// testing for iteration 2
 place(1, 2, "EAST");
 avoid(2, 2);
-console.log(avoidArea);
 avoid(2, 3);
-console.log(avoidArea);
 move();
 place(2, 3, "EAST");
 move();
